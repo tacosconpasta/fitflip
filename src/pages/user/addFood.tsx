@@ -3,7 +3,7 @@ import {
   IonPage, IonHeader, IonToolbar, IonTitle,
   IonContent, IonItem, IonLabel, IonInput,
   IonTextarea, IonButton, IonBackButton, IonButtons,
-  IonToast, IonSearchbar, IonList, IonBadge, IonNote,
+  IonToast, IonSearchbar, IonList, IonBadge,
   IonModal, IonIcon, IonFooter, IonSelect, IonSelectOption,
 } from '@ionic/react';
 import { add } from 'ionicons/icons';
@@ -131,10 +131,6 @@ const AddFood: React.FC = () => {
                     <h2>{f.nombre}</h2>
                     {f.descripcion ? <p>{f.descripcion}</p> : null}
                   </IonLabel>
-                  {/* Veces que se ha registrado. */}
-                  <IonNote slot="end" className="addfood-veces">
-                    x{f.veces}
-                  </IonNote>
                   <IonBadge slot="end" className="addfood-cal">
                     {f.calorias} kcal
                   </IonBadge>

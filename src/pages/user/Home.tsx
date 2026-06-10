@@ -2,9 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   IonRefresher, IonRefresherContent,
   IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonFab,
   IonFabButton,
@@ -133,13 +130,6 @@ const Home: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          {/* El titulo dice "Hoy" si se ve el dia actual, o "Día" en otro caso. */}
-          <IonTitle>{esHoy ? "Hoy" : "Día"}</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-
       {/* scrollY={false}: se desactiva el scroll global del contenido para que
           solo la lista de comidas haga scroll (el calendario y el arco quedan
           fijos arriba). */}
