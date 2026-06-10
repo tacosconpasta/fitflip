@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import {
   IonAvatar,
+  IonBackButton,
   IonButton,
   IonCard,
   IonCardContent,
@@ -107,15 +108,13 @@ const Register: React.FC = () => {
     <IonPage>
       <IonContent className="auth-content">
         <div className="auth-shell">
-          <IonButton
+          <IonBackButton
             className="auth-back"
-            fill="clear"
-            size="small"
-            routerLink="/login"
+            defaultHref="/login"
+            text=""
+            icon={arrowBackOutline}
             aria-label="Volver al inicio de sesión"
-          >
-            <IonIcon icon={arrowBackOutline} slot="icon-only" />
-          </IonButton>
+          />
 
           <header className="auth-brand auth-brand--compact">
             <h1>Registrar Cuenta</h1>
