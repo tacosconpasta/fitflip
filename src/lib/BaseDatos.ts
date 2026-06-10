@@ -38,9 +38,9 @@ const CREATE_TABLES = `
 
   CREATE TABLE IF NOT EXISTS comida (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre       TEXT    NOT NULL,
+    nombre       TEXT    NOT NULL CHECK (length(trim(nombre)) > 0),
     descripcion  TEXT    NOT NULL DEFAULT '',
-    calorias     REAL    NOT NULL DEFAULT 0,
+    calorias     REAL    NOT NULL DEFAULT 0 CHECK (calorias >= 0),
     tipo         TEXT    NOT NULL DEFAULT 'Almuerzo' CHECK (tipo IN ('Desayuno', 'Almuerzo', 'Cena', 'Snack')),
     image        TEXT,
     user_id      INTEGER NOT NULL REFERENCES usuario(id) ON DELETE CASCADE
@@ -53,7 +53,7 @@ const CREATE_TABLES = `
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     dia_id     INTEGER NOT NULL REFERENCES dia(id) ON DELETE CASCADE,
     comida_id  INTEGER NOT NULL REFERENCES comida(id) ON DELETE CASCADE,
-    cantidad   REAL    NOT NULL DEFAULT 1,
+    cantidad   REAL    NOT NULL DEFAULT 1 CHECK (cantidad > 0),
     UNIQUE (dia_id, comida_id)
   );
 `;
@@ -257,8 +257,18 @@ export async function getComidaDelDia(
 
 // Comida (catalogo) queries
 
+function validarDatosComida(nombre: string, calorias: number): void {
+  if (!nombre.trim()) {
+    throw new Error("El nombre es obligatorio");
+  }
+  if (!Number.isFinite(calorias) || calorias < 0) {
+    throw new Error("Las calorías no pueden ser negativas");
+  }
+}
+
 // Inserta una comida nueva en el catalogo del usuario. Devuelve su id.
 export async function insertComida(comida: NewComida): Promise<number> {
+  validarDatosComida(comida.nombre, comida.calorias);
   const conn = await getDb();
   const result = await conn.run(
     "INSERT INTO comida (nombre, descripcion, calorias, tipo, image, user_id) VALUES (?, ?, ?, ?, ?, ?)",
@@ -292,6 +302,7 @@ export async function updateComida(comida: {
   tipo: TipoComida;
   image: string | null;
 }): Promise<void> {
+  validarDatosComida(comida.nombre, comida.calorias);
   const conn = await getDb();
   await conn.run(
     "UPDATE comida SET nombre = ?, descripcion = ?, calorias = ?, tipo = ?, image = ? WHERE id = ?",
@@ -387,6 +398,9 @@ export async function actualizarPorciones(
   registroId: number,
   cantidad: number
 ): Promise<void> {
+  if (!Number.isFinite(cantidad) || cantidad <= 0) {
+    throw new Error("Las porciones deben ser mayores a 0");
+  }
   const conn = await getDb();
   const reg = await conn.query(
     "SELECT dia_id FROM dia_comida WHERE id = ?",

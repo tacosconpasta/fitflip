@@ -63,7 +63,12 @@ const FoodDetail: React.FC = () => {
       setShowToast(true);
       return;
     }
-    if (!(porciones > 0)) {
+    if (!Number.isFinite(calorias) || calorias < 0) {
+      setToastMsg('Las calorías no pueden ser negativas');
+      setShowToast(true);
+      return;
+    }
+    if (!Number.isFinite(porciones) || porciones <= 0) {
       setToastMsg('Las porciones deben ser mayores a 0');
       setShowToast(true);
       return;
@@ -148,6 +153,7 @@ const FoodDetail: React.FC = () => {
                 <IonLabel position="stacked">Calorías por porción</IonLabel>
                 <IonInput
                   type="number"
+                  min="0"
                   value={calorias}
                   onIonInput={e => setCalorias(Number(e.detail.value ?? 0))}
                 />
@@ -187,7 +193,7 @@ const FoodDetail: React.FC = () => {
           <IonInput
             type="number"
             step="0.5"
-            min="0"
+            min="0.01"
             value={porciones}
             onIonInput={e => setPorciones(Number(e.detail.value ?? 0))}
           />

@@ -5,6 +5,7 @@ import {
   IonTextarea, IonButton, IonBackButton, IonButtons,
   IonToast, IonSearchbar, IonList, IonBadge,
   IonModal, IonIcon, IonFooter, IonSelect, IonSelectOption,
+  IonCard, IonCardHeader, IonCardContent,
 } from '@ionic/react';
 import { add } from 'ionicons/icons';
 import { useHistory, useParams } from 'react-router-dom';
@@ -80,6 +81,11 @@ const AddFood: React.FC = () => {
       setShowToast(true);
       return;
     }
+    if (!Number.isFinite(calorias) || calorias < 0) {
+      setToastMsg('Las calorías no pueden ser negativas');
+      setShowToast(true);
+      return;
+    }
     if (userId == null) return;
     if (await comidaExisteEnCatalogo(userId, nombreLimpio)) {
       setToastMsg('Ya existe una comida con ese nombre');
@@ -151,47 +157,64 @@ const AddFood: React.FC = () => {
             </IonToolbar>
           </IonHeader>
           <IonContent>
-            <IonItem>
-              <IonLabel position="stacked">Nombre</IonLabel>
+            <IonCard className="addfood-form-card">
+              <IonCardHeader className="addfood-form-card-header">
               <IonInput
+                className="addfood-form-title-input"
+                aria-label="Nombre de la comida"
                 value={nombre}
                 placeholder="ej. Arroz con pollo"
-                onIonChange={(e) => setNombre(e.detail.value ?? '')}
+                onIonInput={(e) => setNombre(e.detail.value ?? '')}
               />
-            </IonItem>
+              </IonCardHeader>
 
-            <IonItem>
-              <IonLabel position="stacked">Tipo</IonLabel>
-              <IonSelect
-                value={tipo}
-                onIonChange={(e) => setTipo(e.detail.value as TipoComida)}
-              >
-                {TIPOS_COMIDA.map((t) => (
-                  <IonSelectOption key={t} value={t}>
-                    {t}
-                  </IonSelectOption>
-                ))}
-              </IonSelect>
-            </IonItem>
+              <IonCardContent className="addfood-form-card-content">
+                <div className="addfood-form-card-row">
+                  <IonItem lines="none">
+                    <IonLabel position="stacked">Tipo</IonLabel>
+                    <IonSelect
+                      value={tipo}
+                      interface="popover"
+                      onIonChange={(e) =>
+                        setTipo(e.detail.value as TipoComida)
+                      }
+                    >
+                      {TIPOS_COMIDA.map((t) => (
+                        <IonSelectOption key={t} value={t}>
+                          {t}
+                        </IonSelectOption>
+                      ))}
+                    </IonSelect>
+                  </IonItem>
 
-            <IonItem>
-              <IonLabel position="stacked">Descripción</IonLabel>
-              <IonTextarea
-                value={descripcion}
-                placeholder="ej. Sin salsa"
-                onIonChange={(e) => setDescripcion(e.detail.value ?? '')}
-              />
-            </IonItem>
+                  <IonItem lines="none">
+                    <IonLabel position="stacked">Calorías por porción</IonLabel>
+                    <IonInput
+                      type="number"
+                      min="0"
+                      value={calorias}
+                      placeholder="0"
+                      onIonInput={(e) =>
+                        setCalorias(Number(e.detail.value ?? 0))
+                      }
+                    />
+                  </IonItem>
+                </div>
 
-            <IonItem>
-              <IonLabel position="stacked">Calorías</IonLabel>
-              <IonInput
-                type="number"
-                value={calorias}
-                placeholder="0"
-                onIonChange={(e) => setCalorias(Number(e.detail.value ?? 0))}
-              />
-            </IonItem>
+                <IonItem className="addfood-form-description" lines="none">
+                  <IonLabel position="stacked">Descripción</IonLabel>
+                  <IonTextarea
+                    value={descripcion}
+                    placeholder="ej. Sin salsa"
+                    autoGrow
+                    rows={1}
+                    onIonInput={(e) =>
+                      setDescripcion(e.detail.value ?? '')
+                    }
+                  />
+                </IonItem>
+              </IonCardContent>
+            </IonCard>
 
             <div className="addfood-buttons">
               <IonButton expand="block" onClick={guardar}>
