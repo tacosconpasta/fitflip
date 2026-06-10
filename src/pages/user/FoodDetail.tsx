@@ -130,34 +130,65 @@ const FoodDetail: React.FC = () => {
               value={nombre}
               onIonInput={e => setNombre(e.detail.value ?? '')}
             />
+            {registro && nombre !== registro.nombre && (
+              <IonNote
+                className="fooddetail-field-warning"
+                color="danger"
+                role="alert"
+              >
+                Cambiar el nombre afectará TODAS sus apariciones.
+              </IonNote>
+            )}
           </IonCardHeader>
 
           <IonCardContent className="fooddetail-card-content">
             <div className="fooddetail-card-row">
-              <IonItem lines="none">
-                <IonLabel position="stacked">Tipo</IonLabel>
-                <IonSelect
-                  value={tipo}
-                  interface="popover"
-                  onIonChange={e => setTipo(e.detail.value as TipoComida)}
-                >
-                  {TIPOS_COMIDA.map(t => (
-                    <IonSelectOption key={t} value={t}>
-                      {t}
-                    </IonSelectOption>
-                  ))}
-                </IonSelect>
-              </IonItem>
+              <div className="fooddetail-card-field">
+                <IonItem lines="none">
+                  <IonLabel position="stacked">Tipo</IonLabel>
+                  <IonSelect
+                    value={tipo}
+                    interface="popover"
+                    onIonChange={e => setTipo(e.detail.value as TipoComida)}
+                  >
+                    {TIPOS_COMIDA.map(t => (
+                      <IonSelectOption key={t} value={t}>
+                        {t}
+                      </IonSelectOption>
+                    ))}
+                  </IonSelect>
+                </IonItem>
+                {registro && tipo !== registro.tipo && (
+                  <IonNote
+                    className="fooddetail-field-warning"
+                    color="danger"
+                    role="alert"
+                  >
+                    Cambiar el tipo afectará TODAS sus apariciones.
+                  </IonNote>
+                )}
+              </div>
 
-              <IonItem lines="none">
-                <IonLabel position="stacked">Calorías por porción</IonLabel>
-                <IonInput
-                  type="number"
-                  min="0"
-                  value={calorias}
-                  onIonInput={e => setCalorias(Number(e.detail.value ?? 0))}
-                />
-              </IonItem>
+              <div className="fooddetail-card-field">
+                <IonItem lines="none">
+                  <IonLabel position="stacked">Calorías por porción</IonLabel>
+                  <IonInput
+                    type="number"
+                    min="0"
+                    value={calorias}
+                    onIonInput={e => setCalorias(Number(e.detail.value ?? 0))}
+                  />
+                </IonItem>
+                {registro && calorias !== registro.calorias && (
+                  <IonNote
+                    className="fooddetail-field-warning"
+                    color="danger"
+                    role="alert"
+                  >
+                    Cambiar las calorías afectará TODAS sus apariciones.
+                  </IonNote>
+                )}
+              </div>
             </div>
 
             <IonItem className="fooddetail-card-description" lines="none">
@@ -169,14 +200,13 @@ const FoodDetail: React.FC = () => {
                 onIonInput={e => setDescripcion(e.detail.value ?? '')}
               />
             </IonItem>
-
-            {registro && calorias !== registro.calorias && (
+            {registro && descripcion !== registro.descripcion && (
               <IonNote
-                className="fooddetail-calorie-warning"
+                className="fooddetail-field-warning"
                 color="danger"
                 role="alert"
               >
-                Cambiar las calorías afectará TODAS sus apariciones.
+                Cambiar la descripción afectará TODAS sus apariciones.
               </IonNote>
             )}
           </IonCardContent>

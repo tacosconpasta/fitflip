@@ -5,6 +5,7 @@ import type { Usuario } from "../models/Usuario";
 interface AuthContextValue {
   usuario: Usuario | null;
   login: (correo: string, contrasena: string) => Promise<Usuario>;
+  actualizarSesion: (usuario: Usuario) => void;
   logout: () => void;
 }
 
@@ -47,9 +48,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const logout = () => setUsuario(null);
+  const actualizarSesion = (usuarioActualizado: Usuario) =>
+    setUsuario(usuarioActualizado);
 
   return (
-    <AuthContext.Provider value={{ usuario, login, logout }}>
+    <AuthContext.Provider
+      value={{ usuario, login, actualizarSesion, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

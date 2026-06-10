@@ -48,6 +48,10 @@
   gap: 4px;
 }
 
+.fooddetail-card-field {
+  min-width: 0;
+}
+
 .fooddetail-card-description {
   --min-height: 48px;
   margin-top: 2px;
@@ -57,7 +61,7 @@
   min-height: 0;
 }
 
-.fooddetail-calorie-warning {
+.fooddetail-field-warning {
   display: block;
   padding: 4px 8px 2px;
   font-size: 0.78rem;

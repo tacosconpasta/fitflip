@@ -9,9 +9,11 @@ import {
   IonList,
   IonSpinner,
   IonAlert,
+  IonAvatar,
 } from "@ionic/react";
-import { add } from "ionicons/icons";
+import { add, person } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
+import { useAuth } from "../../auth/AuthContext";
 import {
   getDias,
   insertDia,
@@ -25,15 +27,12 @@ import CalorieProgress from "../../components/CalorieProgress";
 import WeekCalendar from "../../components/WeekCalendar";
 import "./Home.css";
 
-// Usuario fijo por ahora. Mas adelante esto vendria del usuario autenticado
-// (AuthContext) en lugar de estar quemado.
-const USER_ID = 1;
-
 // Pantalla principal del area de usuario. Junta el calendario semanal, el arco
 // de calorias y la lista de comidas del dia seleccionado. Permite cambiar de
 // dia desde el calendario, eliminar comidas y navegar a agregar/ver detalle.
 const Home: React.FC = () => {
   const history = useHistory();
+  const { usuario } = useAuth();
   // Fecha de hoy en formato YYYY-MM-DD (misma convencion que el resto de la app).
   const hoy = new Date().toISOString().slice(0, 10);
 
@@ -57,10 +56,15 @@ const Home: React.FC = () => {
 
   // Carga desde la base de datos el dia indicado y sus comidas.
   const cargar = async (fecha: string) => {
+    if (!usuario) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
 
     // Se traen todos los dias del usuario y se busca el de la fecha pedida.
-    let todos = await getDias(USER_ID);
+    let todos = await getDias(usuario.id);
     let target = todos.find((d) => d.fecha === fecha);
 
     // El registro de hoy se crea bajo demanda para que siempre haya un dia que
@@ -71,10 +75,10 @@ const Home: React.FC = () => {
         descripcion: "",
         calorias_meta: 2000,
         calorias_obtenidas: 0,
-        user_id: USER_ID,
+        user_id: usuario.id,
       });
       // Se vuelve a leer para tomar el dia recien creado (ya con su id).
-      todos = await getDias(USER_ID);
+      todos = await getDias(usuario.id);
       target = todos.find((d) => d.fecha === hoy);
     }
 
@@ -99,7 +103,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     cargar(selectedFecha);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFecha]);
+  }, [selectedFecha, usuario?.id]);
 
   // Refresca el dia seleccionado al volver desde las pantallas de agregar o
   // detalle, para reflejar comidas nuevas o eliminadas. Se usa selectedRef para
@@ -142,6 +146,30 @@ const Home: React.FC = () => {
   </IonRefresher>
         {/* Columna que ocupa toda la altura: arriba lo fijo, abajo la lista. */}
         <div className="home-layout">
+          <div className="home-welcome">
+            <div>
+              <span className="home-welcome-label">Bienvenido,</span>
+              <strong className="home-welcome-name">
+                {usuario?.name ?? "Usuario"}
+              </strong>
+            </div>
+
+            <button
+              type="button"
+              className="home-profile-button"
+              aria-label="Editar perfil"
+              onClick={() => history.push("/perfil")}
+            >
+              <IonAvatar className="home-profile-avatar">
+                {usuario?.image ? (
+                  <img src={usuario.image} alt={usuario.name} />
+                ) : (
+                  <IonIcon icon={person} />
+                )}
+              </IonAvatar>
+            </button>
+          </div>
+
           {/* Calendario semanal. Recibe los dias con registro para pintarlos de
               verde y avisa con onSelect cuando se elige otro dia. */}
           <WeekCalendar

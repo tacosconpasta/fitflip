@@ -159,6 +159,38 @@ export async function getUsuarioByCorreo(
   return ((result.values ?? [])[0] as Usuario) ?? null;
 }
 
+export async function updateUsuarioPerfil(usuario: Usuario): Promise<void> {
+  const nombre = usuario.name.trim();
+  const correo = usuario.correo.trim().toLowerCase();
+
+  if (!nombre) throw new Error("El nombre es obligatorio");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+    throw new Error("El correo no tiene un formato válido");
+  }
+  if (usuario.contrasena.length < 6) {
+    throw new Error("La contraseña debe tener al menos 6 caracteres");
+  }
+
+  const conn = await getDb();
+  await conn.run(
+    `UPDATE usuario
+     SET name = ?, correo = ?, contrasena = ?, image = ?
+     WHERE id = ?`,
+    [
+      nombre,
+      correo,
+      usuario.contrasena,
+      usuario.image ?? null,
+      usuario.id,
+    ]
+  );
+}
+
+export async function deleteUsuario(usuarioId: number): Promise<void> {
+  const conn = await getDb();
+  await conn.run("DELETE FROM usuario WHERE id = ?", [usuarioId]);
+}
+
 // Dia queries
 
 export async function insertDia(dia: NewDia): Promise<number> {
