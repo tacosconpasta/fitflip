@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle,
   IonContent, IonItem, IonLabel, IonInput,
-  IonButton, IonBackButton, IonButtons,
+  IonTextarea, IonButton, IonBackButton, IonButtons,
   IonToast, IonAlert, IonSpinner, IonNote, IonSelect, IonSelectOption,
-  IonCard, IonCardHeader, IonCardTitle, IonCardContent,
+  IonCard, IonCardHeader, IonCardContent,
 } from '@ionic/react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
@@ -25,6 +25,7 @@ const FoodDetail: React.FC = () => {
 
   const [registro, setRegistro] = useState<ComidaDelDia | null>(null);
   const [nombre, setNombre] = useState('');
+  const [descripcion, setDescripcion] = useState('');
   const [calorias, setCalorias] = useState<number>(0);
   const [tipo, setTipo] = useState<TipoComida>('Almuerzo');
   const [porciones, setPorciones] = useState<number>(1);
@@ -40,6 +41,7 @@ const FoodDetail: React.FC = () => {
       if (data) {
         setRegistro(data);
         setNombre(data.nombre);
+        setDescripcion(data.descripcion);
         setCalorias(data.calorias);
         setTipo(data.tipo);
         setPorciones(data.cantidad);
@@ -71,8 +73,7 @@ const FoodDetail: React.FC = () => {
     await updateComida({
       id: registro!.comida_id,
       nombre: nombre.trim(),
-      // La descripción no se edita en esta vista, pero se conserva en el catálogo.
-      descripcion: registro!.descripcion,
+      descripcion: descripcion.trim(),
       calorias,
       tipo,
       image: registro!.image,
@@ -118,20 +119,15 @@ const FoodDetail: React.FC = () => {
             diferenciarlos visualmente de las porciones propias del día. */}
         <IonCard className="fooddetail-card">
           <IonCardHeader className="fooddetail-card-header">
-            <IonCardTitle className="fooddetail-card-title">
-              Comida
-            </IonCardTitle>
+            <IonInput
+              className="fooddetail-card-title-input"
+              aria-label="Nombre de la comida"
+              value={nombre}
+              onIonInput={e => setNombre(e.detail.value ?? '')}
+            />
           </IonCardHeader>
 
           <IonCardContent className="fooddetail-card-content">
-            <IonItem className="fooddetail-card-name" lines="inset">
-              <IonLabel position="stacked">Nombre</IonLabel>
-              <IonInput
-                value={nombre}
-                onIonChange={e => setNombre(e.detail.value ?? '')}
-              />
-            </IonItem>
-
             <div className="fooddetail-card-row">
               <IonItem lines="none">
                 <IonLabel position="stacked">Tipo</IonLabel>
@@ -157,6 +153,16 @@ const FoodDetail: React.FC = () => {
                 />
               </IonItem>
             </div>
+
+            <IonItem className="fooddetail-card-description" lines="none">
+              <IonLabel position="stacked">Descripción</IonLabel>
+              <IonTextarea
+                value={descripcion}
+                autoGrow
+                rows={1}
+                onIonInput={e => setDescripcion(e.detail.value ?? '')}
+              />
+            </IonItem>
 
             {registro && calorias !== registro.calorias && (
               <IonNote

@@ -12,11 +12,22 @@
 }
 
 .fooddetail-card-header {
-  padding: 16px 16px 8px;
+  padding: 12px 16px 6px;
 }
 
-.fooddetail-card-title {
-  font-size: 1.15rem;
+.fooddetail-card-title-input {
+  --color: #1b5e20;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+  --padding-start: 0;
+  --padding-end: 0;
+  --highlight-color-focused: #2e7d32;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.fooddetail-card-title-input::part(native) {
+  color: #1b5e20;
   font-weight: 700;
 }
 
@@ -31,14 +42,19 @@
   --min-height: 58px;
 }
 
-.fooddetail-card-name {
-  margin-bottom: 2px;
-}
-
 .fooddetail-card-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 4px;
+}
+
+.fooddetail-card-description {
+  --min-height: 48px;
+  margin-top: 2px;
+}
+
+.fooddetail-card-description ion-textarea {
+  min-height: 0;
 }
 
 .fooddetail-calorie-warning {
@@ -60,7 +76,7 @@
 /* Titulo de seccion (separa los datos de la comida de lo del dia). */
 .fooddetail-section {
   padding: 0 16px;
-  margin: 12px 0 2px;
+  margin: 24px 0 2px;
   font-size: 1.05rem;
   font-weight: 700;
 }
