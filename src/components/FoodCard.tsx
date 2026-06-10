@@ -29,7 +29,16 @@ const FoodCard: React.FC<Props> = ({ comida, onClick, onDelete }) => {
             <h2>{comida.nombre}</h2>
             <p>{comida.descripcion}</p>
           </IonLabel>
-          <IonBadge className="food-card-cal">{comida.calorias} kcal</IonBadge>
+          {/* Calorias ya multiplicadas por la cantidad, y debajo el "xN" si la
+              comida se agrego mas de una vez al dia. */}
+          <div className="food-card-cal-wrap">
+            <IonBadge className="food-card-cal">
+              {comida.calorias * comida.cantidad} kcal
+            </IonBadge>
+            {comida.cantidad > 1 && (
+              <span className="food-card-qty">x{comida.cantidad}</span>
+            )}
+          </div>
         </div>
         {/* Boton de eliminar (icono de basura rojo). Esta separado del cuerpo
             para que tocarlo no abra el detalle, solo dispare onDelete. */}

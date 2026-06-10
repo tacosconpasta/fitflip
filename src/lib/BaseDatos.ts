@@ -5,7 +5,7 @@ import {
 } from "@capacitor-community/sqlite";
 import type { NewUsuario, Usuario } from "../models/Usuario";
 import type { NewDia, Dia, DiaConComidas } from "../models/Dia";
-import type { NewComida, Comida } from "../models/Comida";
+import type { NewComida, Comida, ComidaFrecuente } from "../models/Comida";
 
 const DB_NAME = "fitflip";
 
@@ -36,6 +36,7 @@ const CREATE_TABLES = `
     descripcion  TEXT    NOT NULL DEFAULT '',
     calorias     REAL    NOT NULL DEFAULT 0,
     image        TEXT,
+    cantidad     INTEGER NOT NULL DEFAULT 1,
     dia_id       INTEGER NOT NULL REFERENCES dia(id) ON DELETE CASCADE
   );
 `;
@@ -62,7 +63,22 @@ async function openDb(): Promise<SQLiteDBConnection> {
 
   await conn.open();
   await conn.execute(CREATE_TABLES);
+  await migrate(conn);
   return conn;
+}
+
+// Migraciones ligeras para bases creadas con un esquema anterior. Cada paso se
+// envuelve en try/catch para que sea idempotente (si ya esta aplicado, falla y
+// se ignora).
+async function migrate(conn: SQLiteDBConnection): Promise<void> {
+  try {
+    // Agrega la columna cantidad a comida si la base es de antes de este campo.
+    await conn.execute(
+      "ALTER TABLE comida ADD COLUMN cantidad INTEGER NOT NULL DEFAULT 1"
+    );
+  } catch {
+    // La columna ya existe: nada que hacer.
+  }
 }
 
 function getDb(): Promise<SQLiteDBConnection> {
@@ -189,17 +205,51 @@ export async function getDiaConComidas(
 export async function insertComida(comida: NewComida): Promise<number> {
   const conn = await getDb();
   const result = await conn.run(
-    "INSERT INTO comida (nombre, descripcion, calorias, image, dia_id) VALUES (?, ?, ?, ?, ?)",
+    "INSERT INTO comida (nombre, descripcion, calorias, image, cantidad, dia_id) VALUES (?, ?, ?, ?, ?, ?)",
     [
       comida.nombre,
       comida.descripcion,
       comida.calorias,
       comida.image ?? null,
+      comida.cantidad ?? 1,
       comida.dia_id,
     ]
   );
   await recalcCaloriasObtenidas(comida.dia_id);
   return result.changes?.lastId ?? -1;
+}
+
+// Agrega una comida a un dia colapsando repeticiones: si el dia ya tiene una
+// comida con ese nombre (sin importar mayusculas/minusculas), incrementa su
+// cantidad en 1; si no, la inserta con cantidad 1.
+export async function agregarComidaADia(
+  diaId: number,
+  comida: { nombre: string; descripcion: string; calorias: number; image: string | null }
+): Promise<void> {
+  const conn = await getDb();
+  const existente = await conn.query(
+    "SELECT id FROM comida WHERE dia_id = ? AND nombre = ? COLLATE NOCASE LIMIT 1",
+    [diaId, comida.nombre]
+  );
+  const fila = (existente.values ?? [])[0];
+
+  if (fila) {
+    await conn.run("UPDATE comida SET cantidad = cantidad + 1 WHERE id = ?", [
+      fila.id,
+    ]);
+  } else {
+    await conn.run(
+      "INSERT INTO comida (nombre, descripcion, calorias, image, cantidad, dia_id) VALUES (?, ?, ?, ?, 1, ?)",
+      [
+        comida.nombre,
+        comida.descripcion,
+        comida.calorias,
+        comida.image ?? null,
+        diaId,
+      ]
+    );
+  }
+  await recalcCaloriasObtenidas(diaId);
 }
 
 export async function getComidas(diaId: number): Promise<Comida[]> {
@@ -208,6 +258,49 @@ export async function getComidas(diaId: number): Promise<Comida[]> {
     diaId,
   ]);
   return (result.values ?? []) as Comida[];
+}
+
+// Devuelve las comidas previas del usuario agrupadas por nombre (sin importar
+// mayusculas/minusculas) y ordenadas de la mas registrada a la menos. Para cada
+// grupo se usan los datos del registro mas reciente (MAX(c.id) hace que las
+// columnas "sueltas" tomen el valor de esa fila) como representativos.
+export async function getComidasFrecuentes(
+  userId: number
+): Promise<ComidaFrecuente[]> {
+  const conn = await getDb();
+  const result = await conn.query(
+    `SELECT c.nombre AS nombre,
+            c.descripcion AS descripcion,
+            c.calorias AS calorias,
+            c.image AS image,
+            SUM(c.cantidad) AS veces,
+            MAX(c.id) AS ultimo
+     FROM comida c
+     JOIN dia d ON c.dia_id = d.id
+     WHERE d.user_id = ?
+     GROUP BY c.nombre COLLATE NOCASE
+     ORDER BY veces DESC, c.nombre COLLATE NOCASE ASC`,
+    [userId]
+  );
+  return (result.values ?? []) as ComidaFrecuente[];
+}
+
+// Indica si el usuario ya tiene una comida con ese nombre en cualquiera de sus
+// dias (sin importar mayusculas/minusculas). Sirve para no repetir la misma
+// comida en la lista/catalogo de comidas disponibles.
+export async function comidaExisteEnCatalogo(
+  userId: number,
+  nombre: string
+): Promise<boolean> {
+  const conn = await getDb();
+  const result = await conn.query(
+    `SELECT 1 FROM comida c
+     JOIN dia d ON c.dia_id = d.id
+     WHERE d.user_id = ? AND c.nombre = ? COLLATE NOCASE
+     LIMIT 1`,
+    [userId, nombre]
+  );
+  return (result.values ?? []).length > 0;
 }
 
 export async function getComidaById(comidaId: number): Promise<Comida | null> {
@@ -247,7 +340,7 @@ export async function deleteComida(comidaId: number): Promise<void> {
 async function recalcCaloriasObtenidas(diaId: number): Promise<void> {
   const conn = await getDb();
   const result = await conn.query(
-    "SELECT COALESCE(SUM(calorias), 0) AS total FROM comida WHERE dia_id = ?",
+    "SELECT COALESCE(SUM(calorias * cantidad), 0) AS total FROM comida WHERE dia_id = ?",
     [diaId]
   );
   const total = ((result.values ?? [])[0]?.total as number) ?? 0;

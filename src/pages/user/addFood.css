@@ -4,3 +4,37 @@
   flex-direction: column;
   gap: 8px;
 }
+
+/* Boton "Añadir nueva comida" en el footer. Verde de la marca. */
+.addfood-new-btn {
+  --background: #2e7d32;
+  --background-activated: #1b5e20;
+  --background-hover: #388e3c;
+}
+
+/* Encabezado de seccion ("Comidas frecuentes"). */
+.addfood-section {
+  margin: 16px 16px 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+}
+
+/* Contador de veces que se ha registrado una comida frecuente. */
+.addfood-veces {
+  margin-right: 8px;
+  font-size: 0.8rem;
+}
+
+/* Pildora de calorias en la lista de frecuentes (verde de la marca). */
+.addfood-cal {
+  --background: rgba(0, 200, 83, 0.12);
+  --color: #2e7d32;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
