@@ -325,6 +325,25 @@ export async function updateComida(comida: {
   }
 }
 
+// Elimina una comida del catalogo. ON DELETE CASCADE quita sus enlaces de
+// todos los dias; despues se recalculan los totales de esos dias.
+export async function deleteComidaDelCatalogo(
+  comidaId: number
+): Promise<void> {
+  const conn = await getDb();
+  const dias = await conn.query(
+    "SELECT DISTINCT dia_id FROM dia_comida WHERE comida_id = ?",
+    [comidaId]
+  );
+  const diasAfectados = (dias.values ?? []) as { dia_id: number }[];
+
+  await conn.run("DELETE FROM comida WHERE id = ?", [comidaId]);
+
+  for (const fila of diasAfectados) {
+    await recalcCaloriasObtenidas(fila.dia_id);
+  }
+}
+
 // Indica si el usuario ya tiene una comida con ese nombre en su catalogo (sin
 // importar mayusculas/minusculas). Sirve para no repetir una comida.
 export async function comidaExisteEnCatalogo(

@@ -213,8 +213,8 @@ const Home: React.FC = () => {
             comidaAEliminar tiene un id. Cancelar o cerrar limpia ese id. */}
         <IonAlert
           isOpen={comidaAEliminar != null}
-          header="¿Eliminar comida?"
-          message="Esta acción no se puede deshacer."
+          header="¿Quitar del día?"
+          message="Solo se quitará de este día. Permanecerá en el catálogo y en otros días."
           buttons={[
             {
               text: "Cancelar",
@@ -222,7 +222,7 @@ const Home: React.FC = () => {
               handler: () => setComidaAEliminar(null),
             },
             {
-              text: "Eliminar",
+              text: "Quitar",
               role: "destructive",
               handler: confirmarEliminar,
             },

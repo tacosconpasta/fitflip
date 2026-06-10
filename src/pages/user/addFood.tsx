@@ -5,13 +5,14 @@ import {
   IonTextarea, IonButton, IonBackButton, IonButtons,
   IonToast, IonSearchbar, IonList, IonBadge,
   IonModal, IonIcon, IonFooter, IonSelect, IonSelectOption,
-  IonCard, IonCardHeader, IonCardContent,
+  IonCard, IonCardHeader, IonCardContent, IonAlert,
 } from '@ionic/react';
-import { add } from 'ionicons/icons';
+import { add, trash } from 'ionicons/icons';
 import { useHistory, useParams } from 'react-router-dom';
 import {
   agregarComidaADia, insertComida, getDiaById,
   getComidasFrecuentes, comidaExisteEnCatalogo,
+  deleteComidaDelCatalogo,
 } from '../../lib/BaseDatos';
 import type { ComidaFrecuente, TipoComida } from '../../models/Comida';
 import { TIPOS_COMIDA } from '../../models/Comida';
@@ -41,6 +42,8 @@ const AddFood: React.FC = () => {
   const [frecuentes, setFrecuentes] = useState<ComidaFrecuente[]>([]);
   // Usuario dueño del dia (se usa para el check de catalogo).
   const [userId, setUserId] = useState<number | null>(null);
+  const [comidaAEliminar, setComidaAEliminar] =
+    useState<ComidaFrecuente | null>(null);
 
   // Al montar, se averigua el usuario dueño del dia y se cargan sus comidas
   // frecuentes (ya vienen ordenadas de la mas comida a la menos).
@@ -70,6 +73,14 @@ const AddFood: React.FC = () => {
   const agregarRapido = async (f: ComidaFrecuente) => {
     await agregarComidaADia(Number(diaId), f.id);
     history.goBack();
+  };
+
+  const confirmarEliminarDelCatalogo = async () => {
+    if (!comidaAEliminar || userId == null) return;
+
+    await deleteComidaDelCatalogo(comidaAEliminar.id);
+    setComidaAEliminar(null);
+    setFrecuentes(await getComidasFrecuentes(userId));
   };
 
   // Crea una comida nueva en el catalogo y la agrega al dia. Valida el nombre y
@@ -132,14 +143,26 @@ const AddFood: React.FC = () => {
             <h3 className="addfood-section">Comidas frecuentes</h3>
             <IonList>
               {frecuentesFiltradas.map((f) => (
-                <IonItem button key={f.nombre} onClick={() => agregarRapido(f)}>
+                <IonItem button key={f.id} onClick={() => agregarRapido(f)}>
                   <IonLabel>
                     <h2>{f.nombre}</h2>
-                    {f.descripcion ? <p>{f.descripcion}</p> : null}
+                    <p>{f.tipo}</p>
                   </IonLabel>
                   <IonBadge slot="end" className="addfood-cal">
                     {f.calorias} kcal
                   </IonBadge>
+                  <IonButton
+                    slot="end"
+                    fill="clear"
+                    color="danger"
+                    aria-label={`Eliminar ${f.nombre} del catálogo`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setComidaAEliminar(f);
+                    }}
+                  >
+                    <IonIcon icon={trash} slot="icon-only" />
+                  </IonButton>
                 </IonItem>
               ))}
             </IonList>
@@ -236,6 +259,25 @@ const AddFood: React.FC = () => {
           message={toastMsg}
           duration={2000}
           onDidDismiss={() => setShowToast(false)}
+        />
+
+        <IonAlert
+          isOpen={comidaAEliminar != null}
+          header="¿Eliminar del catálogo?"
+          message={`Se eliminará “${comidaAEliminar?.nombre ?? ''}” y todas sus apariciones anteriores.`}
+          buttons={[
+            {
+              text: 'Cancelar',
+              role: 'cancel',
+              handler: () => setComidaAEliminar(null),
+            },
+            {
+              text: 'Eliminar',
+              role: 'destructive',
+              handler: confirmarEliminarDelCatalogo,
+            },
+          ]}
+          onDidDismiss={() => setComidaAEliminar(null)}
         />
       </IonContent>
 
