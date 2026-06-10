@@ -1,5 +1,6 @@
 import { Route } from "react-router-dom";
 import Home from "./Home";
+import AddFood from "./addFood";
 
 // User area (owner: Coworker A). Landing base path: /home.
 // Add VerDia / CRUD de Comidas routes here, e.g.:
@@ -9,4 +10,7 @@ export const userRoutes = [
   <Route key="home" exact path="/home">
     <Home />
   </Route>,
+  <Route key="add-food" exact path="/dia/:diaId/comida">
+    <AddFood />
+  </Route>
 ];
