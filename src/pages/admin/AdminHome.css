@@ -1,0 +1,84 @@
+/* Layout del panel admin: columna que ocupa toda la altura, con la barra de
+   búsqueda fija arriba y la lista de usuarios en el espacio restante. */
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.admin-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+/* Encabezado de la sección con el conteo de usuarios. */
+.admin-section-header {
+  padding: 0 16px;
+  margin: 8px 0 4px;
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+  font-weight: 500;
+}
+
+/* Contenedor de la lista: ocupa el espacio restante y permite scroll. */
+.admin-list-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.admin-list {
+  height: 100%;
+  overflow-y: auto;
+  padding-top: 4px;
+  padding-bottom: 116px;
+  background: transparent;
+}
+
+/* Estado vacío cuando no hay usuarios. */
+.admin-empty {
+  text-align: center;
+  margin-top: 48px;
+  color: var(--ion-color-medium);
+}
+
+.admin-empty ion-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  color: var(--ion-color-medium-tint);
+}
+
+.admin-empty p {
+  margin: 4px 0;
+}
+
+/* FAB: misma posición y estilo que Home. */
+.admin-fab-wrap {
+  margin-bottom: 20px;
+  margin-inline-end: 14px;
+}
+
+.admin-fab {
+  --background: #2e7d32;
+  --background-activated: #1b5e20;
+  --background-hover: #388e3c;
+  --color: #ffffff;
+  --box-shadow: 0 6px 16px rgba(46, 125, 50, 0.4);
+}
+
+/* Degradado inferior decorativo. */
+.admin-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 72px;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    var(--ion-background-color, #fff),
+    transparent
+  );
+}

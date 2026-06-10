@@ -115,6 +115,34 @@ export async function getUsuarioByCorreo(
   return ((result.values ?? [])[0] as Usuario) ?? null;
 }
 
+export async function getNonAdminUsuarios(): Promise<Usuario[]> {
+  const conn = await getDb();
+  const result = await conn.query(
+    "SELECT * FROM usuario WHERE rol = 'user' ORDER BY name ASC"
+  );
+  return (result.values ?? []) as Usuario[];
+}
+
+export async function updateUsuario(usuario: Usuario): Promise<void> {
+  const conn = await getDb();
+  await conn.run(
+    "UPDATE usuario SET correo = ?, contrasena = ?, name = ?, image = ?, rol = ? WHERE id = ?",
+    [
+      usuario.correo,
+      usuario.contrasena,
+      usuario.name,
+      usuario.image ?? null,
+      usuario.rol,
+      usuario.id,
+    ]
+  );
+}
+
+export async function deleteUsuario(id: number): Promise<void> {
+  const conn = await getDb();
+  await conn.run("DELETE FROM usuario WHERE id = ?", [id]);
+}
+
 // Dia queries
 
 export async function insertDia(dia: NewDia): Promise<number> {

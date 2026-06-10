@@ -1,0 +1,8 @@
+/* Estilos del formulario de crear/editar usuario. Sigue el patrón de
+   addFood.css y FoodDetail.css. */
+.admin-form-buttons {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

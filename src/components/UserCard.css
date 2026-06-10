@@ -1,0 +1,95 @@
+/* Tarjeta de usuario: sigue el estilo visual de FoodCard para mantener la
+   identidad de la app (barra verde izquierda, esquinas redondeadas, sombra
+   suave). */
+.user-card {
+  margin: 8px 12px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Barra de acento verde en el borde izquierdo. */
+.user-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #2e7d32;
+}
+
+.user-card-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 12px 14px 18px;
+}
+
+/* Icono avatar placeholder (circulo verde con inicial). */
+.user-card-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  background: rgba(0, 200, 83, 0.12);
+  color: #2e7d32;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+}
+
+/* Bloque de info: nombre y correo. */
+.user-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-card-info h2 {
+  margin: 0 0 2px;
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-card-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Píldora del rol. */
+.user-card-rol {
+  --background: rgba(0, 200, 83, 0.12);
+  --color: #2e7d32;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Acciones (editar, eliminar). */
+.user-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.user-card-actions ion-button {
+  margin: 0;
+  --padding-start: 6px;
+  --padding-end: 6px;
+}
