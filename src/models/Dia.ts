@@ -1,4 +1,4 @@
-import type { Comida } from "./Comida";
+import type { ComidaDelDia } from "./Comida";
 
 export interface Dia {
   id: number;
@@ -12,5 +12,5 @@ export interface Dia {
 export type NewDia = Omit<Dia, "id">;
 
 export interface DiaConComidas extends Dia {
-  comidas: Comida[];
+  comidas: ComidaDelDia[];
 }

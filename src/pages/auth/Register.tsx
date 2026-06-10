@@ -1,22 +1,28 @@
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import {
+  IonAvatar,
   IonButton,
-  IonButtons,
-  IonBackButton,
+  IonCard,
+  IonCardContent,
   IonContent,
-  IonHeader,
+  IonIcon,
   IonInput,
   IonItem,
-  IonList,
   IonLoading,
   IonPage,
   IonText,
-  IonTitle,
-  IonToolbar,
 } from "@ionic/react";
+import {
+  arrowBackOutline,
+  cameraOutline,
+  leafOutline,
+  person,
+} from "ionicons/icons";
+import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { getUsuarioByCorreo, insertUsuario } from "../../lib/BaseDatos";
 import { useAuth, homeForRol } from "../../auth/AuthContext";
+import "./Auth.css";
 
 const Register: React.FC = () => {
   const history = useHistory();
@@ -26,8 +32,25 @@ const Register: React.FC = () => {
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [confirmar, setConfirmar] = useState("");
+  const [image, setImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const seleccionarFoto = async () => {
+    try {
+      const foto = await Camera.getPhoto({
+        quality: 80,
+        width: 512,
+        height: 512,
+        allowEditing: true,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Prompt,
+      });
+      if (foto.dataUrl) setImage(foto.dataUrl);
+    } catch {
+      // El usuario canceló la cámara o el selector de imágenes.
+    }
+  };
 
   const validar = (): string | null => {
     if (!name.trim()) return "El nombre es obligatorio";
@@ -67,7 +90,7 @@ const Register: React.FC = () => {
         correo: correoNorm,
         contrasena,
         name: name.trim(),
-        image: null,
+        image,
         rol: "user",
       });
 
@@ -82,75 +105,116 @@ const Register: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref="/login" />
-          </IonButtons>
-          <IonTitle>Crear cuenta</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent className="ion-padding">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleRegister();
-          }}
-        >
-          <IonList>
-            <IonItem>
-              <IonInput
-                label="Nombre"
-                labelPlacement="floating"
-                value={name}
-                onIonInput={(e) => setName(e.detail.value ?? "")}
-              />
-            </IonItem>
-            <IonItem>
-              <IonInput
-                label="Correo"
-                labelPlacement="floating"
-                type="email"
-                autocomplete="email"
-                value={correo}
-                onIonInput={(e) => setCorreo(e.detail.value ?? "")}
-              />
-            </IonItem>
-            <IonItem>
-              <IonInput
-                label="Contraseña"
-                labelPlacement="floating"
-                type="password"
-                value={contrasena}
-                onIonInput={(e) => setContrasena(e.detail.value ?? "")}
-              />
-            </IonItem>
-            <IonItem>
-              <IonInput
-                label="Confirmar contraseña"
-                labelPlacement="floating"
-                type="password"
-                value={confirmar}
-                onIonInput={(e) => setConfirmar(e.detail.value ?? "")}
-              />
-            </IonItem>
-          </IonList>
-
-          {error && (
-            <IonText color="danger">
-              <p className="ion-padding-start">{error}</p>
-            </IonText>
-          )}
-
+      <IonContent className="auth-content">
+        <div className="auth-shell">
           <IonButton
-            className="ion-margin-top"
-            expand="block"
-            type="submit"
-            disabled={submitting}
+            className="auth-back"
+            fill="clear"
+            size="small"
+            routerLink="/login"
+            aria-label="Volver al inicio de sesión"
           >
-            Registrarme
+            <IonIcon icon={arrowBackOutline} slot="icon-only" />
           </IonButton>
-        </form>
+
+          <header className="auth-brand auth-brand--compact">
+            <h1>Registrar Cuenta</h1>
+            <p className="auth-subtitle">
+              Crea tu perfil y comienza a registrar tus comidas!
+            </p>
+          </header>
+
+          <IonCard className="auth-card">
+            <IonCardContent>
+              <button
+                type="button"
+                className="auth-avatar-button"
+                onClick={seleccionarFoto}
+                aria-label="Añadir foto de perfil"
+              >
+                <IonAvatar className="auth-avatar">
+                  {image ? (
+                    <img src={image} alt="Foto de perfil" />
+                  ) : (
+                    <IonIcon icon={person} />
+                  )}
+                </IonAvatar>
+                <span className="auth-camera-badge">
+                  <IonIcon icon={cameraOutline} />
+                </span>
+              </button>
+              <p className="auth-avatar-caption">
+                {image ? "Cambiar foto" : "Añadir foto (opcional)"}
+              </p>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleRegister();
+                }}
+              >
+                <IonItem className="auth-field" lines="none">
+                  <IonInput
+                    label="Nombre"
+                    labelPlacement="floating"
+                    value={name}
+                    onIonInput={(e) => setName(e.detail.value ?? "")}
+                  />
+                </IonItem>
+                <IonItem className="auth-field" lines="none">
+                  <IonInput
+                    label="Correo"
+                    labelPlacement="floating"
+                    type="email"
+                    autocomplete="email"
+                    value={correo}
+                    onIonInput={(e) => setCorreo(e.detail.value ?? "")}
+                  />
+                </IonItem>
+                <IonItem className="auth-field" lines="none">
+                  <IonInput
+                    label="Contraseña"
+                    labelPlacement="floating"
+                    type="password"
+                    value={contrasena}
+                    onIonInput={(e) => setContrasena(e.detail.value ?? "")}
+                  />
+                </IonItem>
+                <IonItem className="auth-field" lines="none">
+                  <IonInput
+                    label="Confirmar contraseña"
+                    labelPlacement="floating"
+                    type="password"
+                    value={confirmar}
+                    onIonInput={(e) => setConfirmar(e.detail.value ?? "")}
+                  />
+                </IonItem>
+
+                {error && (
+                  <IonText color="danger">
+                    <p className="auth-error">{error}</p>
+                  </IonText>
+                )}
+
+                <IonButton
+                  className="auth-primary-button"
+                  expand="block"
+                  type="submit"
+                  disabled={submitting}
+                >
+                  Crear Cuenta
+                </IonButton>
+              </form>
+
+              <div className="auth-switch">
+                <span>¿Ya tienes cuenta?</span>
+                <IonButton fill="clear" size="small" routerLink="/login">
+                  Iniciar sesión
+                </IonButton>
+              </div>
+            </IonCardContent>
+          </IonCard>
+        </div>
 
         <IonLoading isOpen={submitting} message="Creando cuenta…" />
       </IonContent>

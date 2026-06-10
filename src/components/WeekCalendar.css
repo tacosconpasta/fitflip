@@ -79,11 +79,6 @@
   color: #fff;
 }
 
-/* Subtle ring on today's cell. */
-.wc-day--today {
-  box-shadow: 0 0 0 2px rgba(0, 200, 83, 0.35);
-}
-
 .wc-day:disabled {
   opacity: 1;
 }

@@ -105,8 +105,6 @@ const WeekCalendar: React.FC<Props> = ({ dias, selected, onSelect }) => {
           const tracked = trackedSet.has(iso);
           // isSelected: es el dia actualmente seleccionado -> verde mas saturado.
           const isSelected = iso === selected;
-          // isToday: es el dia de hoy -> se le agrega un borde resaltado.
-          const isToday = iso === hoy;
 
           // Se arma la lista de clases CSS segun el estado de la celda.
           // El orden importa: --selected va despues de --tracked para que gane
@@ -115,7 +113,6 @@ const WeekCalendar: React.FC<Props> = ({ dias, selected, onSelect }) => {
             'wc-day',
             tracked ? 'wc-day--tracked' : '',
             isSelected ? 'wc-day--selected' : '',
-            isToday ? 'wc-day--today' : '',
           ]
             .filter(Boolean)
             .join(' ');

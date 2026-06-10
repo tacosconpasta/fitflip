@@ -49,6 +49,33 @@
   color: var(--ion-color-medium);
 }
 
+/* Chip del tipo de comida (Desayuno, Almuerzo, ...) en la linea secundaria. */
+.food-card-tipo {
+  display: inline-block;
+  background: rgba(0, 200, 83, 0.12);
+  color: #2e7d32;
+  font-weight: 600;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-right: 6px;
+}
+
+/* Columna a la derecha: la pildora de calorias y debajo el "xN". */
+.food-card-cal-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+/* Multiplicador de cantidad ("x2", "x3"...) debajo de las calorias. */
+.food-card-qty {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
 /* Pildora de calorias: verde suave de fondo con texto verde oscuro. */
 .food-card-cal {
   --background: rgba(0, 200, 83, 0.12);

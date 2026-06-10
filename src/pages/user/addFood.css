@@ -1,6 +1,98 @@
+.addfood-form-card {
+  margin: 14px 12px 10px;
+  border-radius: 16px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+}
+
+.addfood-form-card-header {
+  padding: 12px 16px 6px;
+}
+
+.addfood-form-title-input {
+  --color: #1b5e20;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+  --padding-start: 0;
+  --padding-end: 0;
+  --highlight-color-focused: #2e7d32;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.addfood-form-title-input::part(native) {
+  color: #1b5e20;
+  font-weight: 700;
+}
+
+.addfood-form-card-content {
+  padding: 0 8px 10px;
+}
+
+.addfood-form-card-content ion-item {
+  --background: transparent;
+  --padding-start: 8px;
+  --inner-padding-end: 8px;
+  --min-height: 58px;
+}
+
+.addfood-form-card-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 4px;
+}
+
+.addfood-form-description {
+  --min-height: 48px;
+  margin-top: 2px;
+}
+
+.addfood-form-description ion-textarea {
+  min-height: 0;
+}
+
 .addfood-buttons {
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* Boton "Añadir nueva comida" en el footer. Verde de la marca. */
+.addfood-new-btn {
+  --background: #2e7d32;
+  --background-activated: #1b5e20;
+  --background-hover: #388e3c;
+}
+
+/* Encabezado de seccion ("Comidas frecuentes"). */
+.addfood-section {
+  margin: 16px 16px 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+}
+
+/* Contador de veces que se ha registrado una comida frecuente. */
+.addfood-veces {
+  margin-right: 8px;
+  font-size: 0.8rem;
+}
+
+/* Pildora de calorias en la lista de frecuentes (verde de la marca). */
+.addfood-cal {
+  --background: rgba(0, 200, 83, 0.12);
+  --color: #2e7d32;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+@media (max-width: 360px) {
+  .addfood-form-card-row {
+    grid-template-columns: 1fr;
+  }
 }
