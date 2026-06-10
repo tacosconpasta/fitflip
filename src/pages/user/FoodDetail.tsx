@@ -3,14 +3,18 @@ import {
   IonPage, IonHeader, IonToolbar, IonTitle,
   IonContent, IonItem, IonLabel, IonInput,
   IonTextarea, IonButton, IonBackButton, IonButtons,
-  IonToast, IonAlert, IonSpinner
+  IonToast, IonAlert, IonSpinner, IonNote, IonSelect, IonSelectOption,
 } from '@ionic/react';
 import { useHistory, useParams } from 'react-router-dom';
-import { getComidaById, updateComida, deleteComida } from '../../lib/BaseDatos';
-import type { Comida } from '../../models/Comida';
+import {
+  getComidaDelDia, updateComida, actualizarPorciones, quitarComidaDeDia,
+} from '../../lib/BaseDatos';
+import type { ComidaDelDia, TipoComida } from '../../models/Comida';
+import { TIPOS_COMIDA } from '../../models/Comida';
 import './FoodDetail.css';
 
 interface Params {
+  // id del registro en dia_comida (la comida dentro de un dia).
   id: string;
 }
 
@@ -18,10 +22,13 @@ const FoodDetail: React.FC = () => {
   const { id } = useParams<Params>();
   const history = useHistory();
 
-  const [comida, setComida] = useState<Comida | null>(null);
+  const [registro, setRegistro] = useState<ComidaDelDia | null>(null);
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [calorias, setCalorias] = useState<number>(0);
+  const [tipo, setTipo] = useState<TipoComida>('Almuerzo');
+  const [porciones, setPorciones] = useState<number>(1);
+  const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
@@ -29,17 +36,25 @@ const FoodDetail: React.FC = () => {
 
   useEffect(() => {
     const cargar = async () => {
-      const data = await getComidaById(Number(id));
+      const data = await getComidaDelDia(Number(id));
       if (data) {
-        setComida(data);
+        setRegistro(data);
         setNombre(data.nombre);
         setDescripcion(data.descripcion);
         setCalorias(data.calorias);
+        setTipo(data.tipo);
+        setPorciones(data.cantidad);
       }
       setLoading(false);
     };
     cargar();
   }, [id]);
+
+  // El total se recalcula de forma dinamica al cambiar las calorias o las
+  // porciones (antes de guardar), no solo al guardar.
+  useEffect(() => {
+    setTotal(Math.round(calorias * porciones));
+  }, [calorias, porciones]);
 
   const guardar = async () => {
     if (!nombre.trim()) {
@@ -47,21 +62,31 @@ const FoodDetail: React.FC = () => {
       setShowToast(true);
       return;
     }
+    if (!(porciones > 0)) {
+      setToastMsg('Las porciones deben ser mayores a 0');
+      setShowToast(true);
+      return;
+    }
 
+    // Datos de la comida (catalogo): afecta todos los dias que la usan.
     await updateComida({
-      ...comida!,
+      id: registro!.comida_id,
       nombre: nombre.trim(),
       descripcion: descripcion.trim(),
       calorias,
+      tipo,
+      image: registro!.image,
     });
+    // Porciones de esta comida en este dia (solo este registro).
+    await actualizarPorciones(Number(id), porciones);
 
     setToastMsg('Comida actualizada');
     setShowToast(true);
-    setTimeout(() => history.goBack(), 1500);
+    setTimeout(() => history.goBack(), 1200);
   };
 
   const eliminar = async () => {
-    await deleteComida(Number(id));
+    await quitarComidaDeDia(Number(id));
     history.goBack();
   };
 
@@ -89,12 +114,34 @@ const FoodDetail: React.FC = () => {
       </IonHeader>
 
       <IonContent>
+        {/* Seccion 1: datos de la comida (catalogo). Editar esto afecta la
+            comida en TODOS los dias que la usan. */}
+        <h2 className="fooddetail-section">Información de la comida</h2>
+        <IonNote className="fooddetail-section-note">
+          Estos datos son de la comida. Si los cambias, se actualizan en todos
+          los días que la usan, no solo en este.
+        </IonNote>
+
         <IonItem>
           <IonLabel position="stacked">Nombre</IonLabel>
           <IonInput
             value={nombre}
             onIonChange={e => setNombre(e.detail.value ?? '')}
           />
+        </IonItem>
+
+        <IonItem>
+          <IonLabel position="stacked">Tipo</IonLabel>
+          <IonSelect
+            value={tipo}
+            onIonChange={e => setTipo(e.detail.value as TipoComida)}
+          >
+            {TIPOS_COMIDA.map(t => (
+              <IonSelectOption key={t} value={t}>
+                {t}
+              </IonSelectOption>
+            ))}
+          </IonSelect>
         </IonItem>
 
         <IonItem>
@@ -106,32 +153,65 @@ const FoodDetail: React.FC = () => {
         </IonItem>
 
         <IonItem>
-          <IonLabel position="stacked">Calorías</IonLabel>
+          <IonLabel position="stacked">Calorías por porción</IonLabel>
           <IonInput
             type="number"
             value={calorias}
-            onIonChange={e => setCalorias(Number(e.detail.value ?? 0))}
+            onIonInput={e => setCalorias(Number(e.detail.value ?? 0))}
           />
         </IonItem>
 
-      <div className="fooddetail-info">
-          <p>Edita los campos que necesites y guarda los cambios.</p>
-        </div>
+        {/* Seccion 2: lo que es propio de este dia. */}
+        <h2 className="fooddetail-section">En este día</h2>
+        <IonNote className="fooddetail-section-note">
+          Las porciones solo cambian en este día.
+        </IonNote>
+
+        <IonItem>
+          <IonLabel position="stacked">Porciones</IonLabel>
+          <IonInput
+            type="number"
+            step="0.5"
+            min="0"
+            value={porciones}
+            onIonInput={e => setPorciones(Number(e.detail.value ?? 0))}
+          />
+        </IonItem>
+
+        <IonItem>
+          <IonLabel position="stacked">Total de calorías</IonLabel>
+          {/* Solo lectura (no editable): el estado total se actualiza solo al
+              cambiar las calorías o las porciones. */}
+          <IonInput
+            className="fooddetail-total"
+            type="number"
+            value={total}
+            readonly
+          />
+        </IonItem>
+
         <div className="fooddetail-buttons">
           <IonButton expand="block" onClick={guardar}>
             Guardar cambios
           </IonButton>
-          <IonButton expand="block" fill="outline" color="danger" className="fooddetail-danger" onClick={() => setShowAlert(true)}>
-            Eliminar comida
+          <IonButton
+            expand="block"
+            fill="outline"
+            color="danger"
+            className="fooddetail-danger"
+            onClick={() => setShowAlert(true)}
+          >
+            Quitar del día
           </IonButton>
         </div>
+
         <IonAlert
           isOpen={showAlert}
-          header="¿Eliminar comida?"
-          message="Esta acción no se puede deshacer."
+          header="¿Quitar comida del día?"
+          message="Se quitará de este día. La comida seguirá en tu lista."
           buttons={[
             { text: 'Cancelar', role: 'cancel' },
-            { text: 'Eliminar', role: 'destructive', handler: eliminar }
+            { text: 'Quitar', role: 'destructive', handler: eliminar },
           ]}
           onDidDismiss={() => setShowAlert(false)}
         />

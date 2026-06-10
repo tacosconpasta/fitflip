@@ -4,14 +4,16 @@ import {
   IonContent, IonItem, IonLabel, IonInput,
   IonTextarea, IonButton, IonBackButton, IonButtons,
   IonToast, IonSearchbar, IonList, IonBadge, IonNote,
-  IonModal, IonIcon, IonFooter,
+  IonModal, IonIcon, IonFooter, IonSelect, IonSelectOption,
 } from '@ionic/react';
 import { add } from 'ionicons/icons';
 import { useHistory, useParams } from 'react-router-dom';
 import {
-  agregarComidaADia, getDiaById, getComidasFrecuentes, comidaExisteEnCatalogo,
+  agregarComidaADia, insertComida, getDiaById,
+  getComidasFrecuentes, comidaExisteEnCatalogo,
 } from '../../lib/BaseDatos';
-import type { ComidaFrecuente } from '../../models/Comida';
+import type { ComidaFrecuente, TipoComida } from '../../models/Comida';
+import { TIPOS_COMIDA } from '../../models/Comida';
 import './AddFood.css';
 
 interface Params {
@@ -26,6 +28,7 @@ const AddFood: React.FC = () => {
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [calorias, setCalorias] = useState<number>(0);
+  const [tipo, setTipo] = useState<TipoComida>('Almuerzo');
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
 
@@ -61,20 +64,15 @@ const AddFood: React.FC = () => {
       )
     : frecuentes;
 
-  // Agrega una comida frecuente al dia y vuelve atras. Si ya estaba en el dia
-  // se colapsa (incrementa su cantidad) en lugar de duplicar la fila.
+  // Agrega una comida del catalogo al dia y vuelve atras. Si ya estaba en el
+  // dia se colapsa (suma una porcion) en lugar de duplicar el enlace.
   const agregarRapido = async (f: ComidaFrecuente) => {
-    await agregarComidaADia(Number(diaId), {
-      nombre: f.nombre,
-      descripcion: f.descripcion,
-      calorias: f.calorias,
-      image: f.image,
-    });
+    await agregarComidaADia(Number(diaId), f.id);
     history.goBack();
   };
 
-  // Guarda una comida nueva escrita manualmente. Valida el nombre y que no
-  // exista ya en el catalogo del usuario (no se puede repetir una comida).
+  // Crea una comida nueva en el catalogo y la agrega al dia. Valida el nombre y
+  // que no exista ya en el catalogo del usuario (no se puede repetir una comida).
   const guardar = async () => {
     const nombreLimpio = nombre.trim();
     if (!nombreLimpio) {
@@ -82,18 +80,22 @@ const AddFood: React.FC = () => {
       setShowToast(true);
       return;
     }
-    if (userId != null && (await comidaExisteEnCatalogo(userId, nombreLimpio))) {
+    if (userId == null) return;
+    if (await comidaExisteEnCatalogo(userId, nombreLimpio)) {
       setToastMsg('Ya existe una comida con ese nombre');
       setShowToast(true);
       return;
     }
 
-    await agregarComidaADia(Number(diaId), {
+    const comidaId = await insertComida({
       nombre: nombreLimpio,
       descripcion: descripcion.trim(),
       calorias,
+      tipo,
       image: null,
+      user_id: userId,
     });
+    await agregarComidaADia(Number(diaId), comidaId);
 
     history.goBack();
   };
@@ -163,10 +165,24 @@ const AddFood: React.FC = () => {
             </IonItem>
 
             <IonItem>
+              <IonLabel position="stacked">Tipo</IonLabel>
+              <IonSelect
+                value={tipo}
+                onIonChange={(e) => setTipo(e.detail.value as TipoComida)}
+              >
+                {TIPOS_COMIDA.map((t) => (
+                  <IonSelectOption key={t} value={t}>
+                    {t}
+                  </IonSelectOption>
+                ))}
+              </IonSelect>
+            </IonItem>
+
+            <IonItem>
               <IonLabel position="stacked">Descripción</IonLabel>
               <IonTextarea
                 value={descripcion}
-                placeholder="ej. Almuerzo"
+                placeholder="ej. Sin salsa"
                 onIonChange={(e) => setDescripcion(e.detail.value ?? '')}
               />
             </IonItem>

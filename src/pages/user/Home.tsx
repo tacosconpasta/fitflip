@@ -19,9 +19,9 @@ import {
   getDias,
   insertDia,
   getDiaConComidas,
-  deleteComida,
+  quitarComidaDeDia,
 } from "../../lib/BaseDatos";
-import type { Comida } from "../../models/Comida";
+import type { ComidaDelDia } from "../../models/Comida";
 import type { Dia } from "../../models/Dia";
 import FoodCard from "../../components/FoodCard";
 import CalorieProgress from "../../components/CalorieProgress";
@@ -47,7 +47,7 @@ const Home: React.FC = () => {
   // Dia cargado (con sus calorias meta/obtenidas) correspondiente a selectedFecha.
   const [dia, setDia] = useState<Dia | null>(null);
   // Comidas del dia que se esta viendo.
-  const [comidas, setComidas] = useState<Comida[]>([]);
+  const [comidas, setComidas] = useState<ComidaDelDia[]>([]);
   // Indicador de carga mientras se consulta la base de datos.
   const [loading, setLoading] = useState(true);
   // Id de la comida pendiente de confirmar para eliminar (null = no hay alerta).
@@ -112,10 +112,10 @@ const Home: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history]);
 
-  // Confirma la eliminacion de la comida pendiente y recarga el dia actual.
+  // Confirma quitar la comida del dia (no la borra del catalogo) y recarga.
   const confirmarEliminar = async () => {
     if (comidaAEliminar != null) {
-      await deleteComida(comidaAEliminar);
+      await quitarComidaDeDia(comidaAEliminar);
       setComidaAEliminar(null);
       await cargar(selectedFecha);
     }
@@ -193,7 +193,7 @@ const Home: React.FC = () => {
                   <IonList className="home-list">
                     {comidas.map((c) => (
                       <FoodCard
-                        key={c.id}
+                        key={c.registro_id}
                         comida={c}
                         onClick={(id) => history.push(`/food-detail/${id}`)}
                         onDelete={(id) => setComidaAEliminar(id)}

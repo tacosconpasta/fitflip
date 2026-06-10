@@ -5,14 +5,31 @@
   height: 50vh;
 }
 
-.fooddetail-info {
-  padding: 16px 16px 0;
+/* Campo de total de calorias: verde y en negrita para que resalte y se vea que
+   es un valor calculado, no opaco como un campo deshabilitado. */
+.fooddetail-total {
+  --color: #2e7d32;
+  font-weight: 700;
+  font-size: 1.25rem;
 }
 
-.fooddetail-info p {
-  color: var(--ion-color-medium);
-  font-size: 0.9rem;
-  margin: 0;
+/* Titulo de seccion (separa los datos de la comida de lo del dia). */
+.fooddetail-section {
+  padding: 0 16px;
+  margin: 24px 0 2px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.fooddetail-section:first-of-type {
+  margin-top: 12px;
+}
+
+/* Nota explicativa debajo del titulo de seccion. */
+.fooddetail-section-note {
+  display: block;
+  padding: 0 16px 8px;
+  font-size: 0.85rem;
 }
 
 .fooddetail-buttons {
