@@ -1,5 +1,70 @@
-.food-card-row {
+/* Tarjeta de comida: esquinas mas redondeadas, sombra suave y una barra de
+   acento verde a la izquierda para darle identidad. */
+.food-card {
+  margin: 8px 12px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Barra de acento verde en el borde izquierdo. */
+.food-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #2e7d32;
+}
+
+.food-card-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 12px 14px 18px;
+}
+
+.food-card-main {
+  flex: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+/* Nombre de la comida. */
+.food-card-main h2 {
+  margin: 0 0 2px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Descripcion en gris y mas pequeña. */
+.food-card-main p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+}
+
+/* Pildora de calorias: verde suave de fondo con texto verde oscuro. */
+.food-card-cal {
+  --background: rgba(0, 200, 83, 0.12);
+  --color: #2e7d32;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.food-card-delete {
+  margin: 0;
+  --padding-start: 6px;
+  --padding-end: 6px;
 }

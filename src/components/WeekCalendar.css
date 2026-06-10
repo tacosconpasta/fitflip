@@ -1,0 +1,89 @@
+.week-calendar {
+  padding: 12px 8px 8px;
+  user-select: none;
+}
+
+.wc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 10px;
+}
+
+.wc-month {
+  font-weight: 600;
+  text-transform: capitalize;
+  font-size: 0.95rem;
+}
+
+.wc-nav {
+  background: none;
+  border: none;
+  padding: 4px;
+  font-size: 1.2rem;
+  color: var(--ion-color-medium);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.wc-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.wc-cell {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.wc-dow {
+  font-size: 0.7rem;
+  color: var(--ion-color-medium);
+}
+
+/* Fixed dimensions so the calendar never shrinks or grows with the content
+   below it. */
+.wc-day {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ion-text-color, #1a1a1a);
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+/* A tracked day: a bit dark-green square, rounded corners, white text. */
+.wc-day--tracked {
+  background: #2e7d32;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* The currently selected day: a more saturated green. Placed after --tracked
+   so it wins when both apply. */
+.wc-day--selected {
+  background: #00c853;
+  color: #fff;
+}
+
+/* Subtle ring on today's cell. */
+.wc-day--today {
+  box-shadow: 0 0 0 2px rgba(0, 200, 83, 0.35);
+}
+
+.wc-day:disabled {
+  opacity: 1;
+}

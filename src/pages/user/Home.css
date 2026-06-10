@@ -1,12 +1,82 @@
+/* Columna que ocupa toda la altura del contenido: el calendario y el arco
+   quedan fijos arriba y la lista de comidas se lleva el espacio restante. */
+.home-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .home-loading {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 50vh;
+  height: 200px;
+}
+
+.home-date {
+  text-transform: capitalize;
+  padding: 0 16px;
+  margin: 8px 0;
+  font-size: 1rem;
+  color: var(--ion-color-medium);
 }
 
 .home-empty {
   text-align: center;
-  margin-top: 40vh;
+  margin-top: 24px;
   color: var(--ion-color-medium);
+}
+
+/* Contenedor de la lista: ocupa el espacio que sobra y sirve de referencia
+   para posicionar el degradado inferior. min-height 0 permite que el hijo con
+   scroll se encoja por debajo de su contenido y pueda desbordar. */
+.home-list-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+/* La lista de comidas es la unica zona con scroll. El padding inferior es el
+   margin que deja espacio para que el boton + no tape el boton de eliminar de
+   la ultima comida. Fondo transparente para que se vean las sombras de las
+   tarjetas sobre el fondo del contenido. */
+.home-list {
+  height: 100%;
+  overflow-y: auto;
+  padding-top: 4px;
+  padding-bottom: 116px;
+  background: transparent;
+}
+
+/* Posicion del FAB: un poco mas arriba del fondo y mas separado de la derecha. */
+.home-fab-wrap {
+  margin-bottom: 20px;
+  margin-inline-end: 14px;
+}
+
+/* Boton flotante (+) en verde solido, texto blanco y sombra verde para resaltar. */
+.home-fab {
+  --background: #2e7d32;
+  --background-activated: #1b5e20;
+  --background-hover: #388e3c;
+  --color: #ffffff;
+  --box-shadow: 0 6px 16px rgba(46, 125, 50, 0.4);
+}
+
+/* Degradado blanco de abajo hacia arriba al final de la lista. pointer-events
+   none para que sea solo decorativo y no bloquee los toques de las comidas que
+   quedan debajo. Usa la variable de fondo para verse bien tambien en modo
+   oscuro (en modo claro es blanco). */
+.home-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 72px;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    var(--ion-background-color, #fff),
+    transparent
+  );
 }
