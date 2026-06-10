@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle,
   IonContent, IonItem, IonLabel, IonInput,
-  IonTextarea, IonButton, IonBackButton, IonButtons,
+  IonButton, IonBackButton, IonButtons,
   IonToast, IonAlert, IonSpinner, IonNote, IonSelect, IonSelectOption,
+  IonCard, IonCardHeader, IonCardTitle, IonCardContent,
 } from '@ionic/react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
@@ -24,7 +25,6 @@ const FoodDetail: React.FC = () => {
 
   const [registro, setRegistro] = useState<ComidaDelDia | null>(null);
   const [nombre, setNombre] = useState('');
-  const [descripcion, setDescripcion] = useState('');
   const [calorias, setCalorias] = useState<number>(0);
   const [tipo, setTipo] = useState<TipoComida>('Almuerzo');
   const [porciones, setPorciones] = useState<number>(1);
@@ -40,7 +40,6 @@ const FoodDetail: React.FC = () => {
       if (data) {
         setRegistro(data);
         setNombre(data.nombre);
-        setDescripcion(data.descripcion);
         setCalorias(data.calorias);
         setTipo(data.tipo);
         setPorciones(data.cantidad);
@@ -72,7 +71,8 @@ const FoodDetail: React.FC = () => {
     await updateComida({
       id: registro!.comida_id,
       nombre: nombre.trim(),
-      descripcion: descripcion.trim(),
+      // La descripción no se edita en esta vista, pero se conserva en el catálogo.
+      descripcion: registro!.descripcion,
       calorias,
       tipo,
       image: registro!.image,
@@ -114,52 +114,61 @@ const FoodDetail: React.FC = () => {
       </IonHeader>
 
       <IonContent>
-        {/* Seccion 1: datos de la comida (catalogo). Editar esto afecta la
-            comida en TODOS los dias que la usan. */}
-        <h2 className="fooddetail-section">Información de la comida</h2>
-        <IonNote className="fooddetail-section-note">
-          Estos datos son de la comida. Si los cambias, se actualizan en todos
-          los días que la usan, no solo en este.
-        </IonNote>
+        {/* Los datos compartidos del catálogo se agrupan en una tarjeta para
+            diferenciarlos visualmente de las porciones propias del día. */}
+        <IonCard className="fooddetail-card">
+          <IonCardHeader className="fooddetail-card-header">
+            <IonCardTitle className="fooddetail-card-title">
+              Comida
+            </IonCardTitle>
+          </IonCardHeader>
 
-        <IonItem>
-          <IonLabel position="stacked">Nombre</IonLabel>
-          <IonInput
-            value={nombre}
-            onIonChange={e => setNombre(e.detail.value ?? '')}
-          />
-        </IonItem>
+          <IonCardContent className="fooddetail-card-content">
+            <IonItem className="fooddetail-card-name" lines="inset">
+              <IonLabel position="stacked">Nombre</IonLabel>
+              <IonInput
+                value={nombre}
+                onIonChange={e => setNombre(e.detail.value ?? '')}
+              />
+            </IonItem>
 
-        <IonItem>
-          <IonLabel position="stacked">Tipo</IonLabel>
-          <IonSelect
-            value={tipo}
-            onIonChange={e => setTipo(e.detail.value as TipoComida)}
-          >
-            {TIPOS_COMIDA.map(t => (
-              <IonSelectOption key={t} value={t}>
-                {t}
-              </IonSelectOption>
-            ))}
-          </IonSelect>
-        </IonItem>
+            <div className="fooddetail-card-row">
+              <IonItem lines="none">
+                <IonLabel position="stacked">Tipo</IonLabel>
+                <IonSelect
+                  value={tipo}
+                  interface="popover"
+                  onIonChange={e => setTipo(e.detail.value as TipoComida)}
+                >
+                  {TIPOS_COMIDA.map(t => (
+                    <IonSelectOption key={t} value={t}>
+                      {t}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonItem>
 
-        <IonItem>
-          <IonLabel position="stacked">Descripción</IonLabel>
-          <IonTextarea
-            value={descripcion}
-            onIonChange={e => setDescripcion(e.detail.value ?? '')}
-          />
-        </IonItem>
+              <IonItem lines="none">
+                <IonLabel position="stacked">Calorías por porción</IonLabel>
+                <IonInput
+                  type="number"
+                  value={calorias}
+                  onIonInput={e => setCalorias(Number(e.detail.value ?? 0))}
+                />
+              </IonItem>
+            </div>
 
-        <IonItem>
-          <IonLabel position="stacked">Calorías por porción</IonLabel>
-          <IonInput
-            type="number"
-            value={calorias}
-            onIonInput={e => setCalorias(Number(e.detail.value ?? 0))}
-          />
-        </IonItem>
+            {registro && calorias !== registro.calorias && (
+              <IonNote
+                className="fooddetail-calorie-warning"
+                color="danger"
+                role="alert"
+              >
+                Cambiar las calorías afectará TODAS sus apariciones.
+              </IonNote>
+            )}
+          </IonCardContent>
+        </IonCard>
 
         {/* Seccion 2: lo que es propio de este dia. */}
         <h2 className="fooddetail-section">En este día</h2>

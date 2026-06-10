@@ -5,6 +5,50 @@
   height: 50vh;
 }
 
+.fooddetail-card {
+  margin: 14px 12px 10px;
+  border-radius: 16px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+}
+
+.fooddetail-card-header {
+  padding: 16px 16px 8px;
+}
+
+.fooddetail-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.fooddetail-card-content {
+  padding: 0 8px 10px;
+}
+
+.fooddetail-card-content ion-item {
+  --background: transparent;
+  --padding-start: 8px;
+  --inner-padding-end: 8px;
+  --min-height: 58px;
+}
+
+.fooddetail-card-name {
+  margin-bottom: 2px;
+}
+
+.fooddetail-card-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 4px;
+}
+
+.fooddetail-calorie-warning {
+  display: block;
+  padding: 4px 8px 2px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
 /* Campo de total de calorias: verde y en negrita para que resalte y se vea que
    es un valor calculado, no opaco como un campo deshabilitado. */
 .fooddetail-total {
@@ -16,13 +60,9 @@
 /* Titulo de seccion (separa los datos de la comida de lo del dia). */
 .fooddetail-section {
   padding: 0 16px;
-  margin: 24px 0 2px;
+  margin: 12px 0 2px;
   font-size: 1.05rem;
   font-weight: 700;
-}
-
-.fooddetail-section:first-of-type {
-  margin-top: 12px;
 }
 
 /* Nota explicativa debajo del titulo de seccion. */
@@ -41,4 +81,10 @@
 
 .fooddetail-danger {
   margin-top: 8px;
+}
+
+@media (max-width: 360px) {
+  .fooddetail-card-row {
+    grid-template-columns: 1fr;
+  }
 }
