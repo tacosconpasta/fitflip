@@ -1,0 +1,12 @@
+.home-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+}
+
+.home-empty {
+  text-align: center;
+  margin-top: 40vh;
+  color: var(--ion-color-medium);
+}
