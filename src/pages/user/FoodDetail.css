@@ -5,9 +5,23 @@
   height: 50vh;
 }
 
+.fooddetail-info {
+  padding: 16px 16px 0;
+}
+
+.fooddetail-info p {
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
 .fooddetail-buttons {
-  padding: 16px;
+  padding: 24px 16px 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.fooddetail-danger {
+  margin-top: 8px;
 }

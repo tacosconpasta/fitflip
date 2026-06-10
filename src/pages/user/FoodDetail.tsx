@@ -114,15 +114,17 @@ const FoodDetail: React.FC = () => {
           />
         </IonItem>
 
+      <div className="fooddetail-info">
+          <p>Edita los campos que necesites y guarda los cambios.</p>
+        </div>
         <div className="fooddetail-buttons">
           <IonButton expand="block" onClick={guardar}>
             Guardar cambios
           </IonButton>
-          <IonButton expand="block" fill="outline" color="danger" onClick={() => setShowAlert(true)}>
+          <IonButton expand="block" fill="outline" color="danger" className="fooddetail-danger" onClick={() => setShowAlert(true)}>
             Eliminar comida
           </IonButton>
         </div>
-
         <IonAlert
           isOpen={showAlert}
           header="¿Eliminar comida?"

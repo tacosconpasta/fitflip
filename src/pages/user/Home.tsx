@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
+  IonRefresher, IonRefresherContent,
   IonPage,
   IonHeader,
   IonToolbar,
@@ -143,6 +144,12 @@ const Home: React.FC = () => {
           solo la lista de comidas haga scroll (el calendario y el arco quedan
           fijos arriba). */}
       <IonContent scrollY={false}>
+        <IonRefresher slot="fixed" onIonRefresh={async (e) => {
+    await cargar(selectedFecha);
+    e.detail.complete();
+  }}>
+    <IonRefresherContent />
+  </IonRefresher>
         {/* Columna que ocupa toda la altura: arriba lo fijo, abajo la lista. */}
         <div className="home-layout">
           {/* Calendario semanal. Recibe los dias con registro para pintarlos de
