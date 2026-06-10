@@ -1,0 +1,7 @@
+{
+  "name": "fitflip",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
