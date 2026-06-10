@@ -2,18 +2,19 @@ import { useState } from "react";
 import { Redirect, useHistory } from "react-router-dom";
 import {
   IonButton,
+  IonCard,
+  IonCardContent,
   IonContent,
-  IonHeader,
+  IonIcon,
   IonInput,
   IonItem,
-  IonList,
   IonLoading,
   IonPage,
   IonText,
-  IonTitle,
-  IonToolbar,
 } from "@ionic/react";
+import { leafOutline, logInOutline } from "ionicons/icons";
 import { useAuth, homeForRol } from "../../auth/AuthContext";
+import "./Auth.css";
 
 const Login: React.FC = () => {
   const history = useHistory();
@@ -60,62 +61,76 @@ const Login: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Iniciar sesión</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent className="ion-padding">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleLogin();
-          }}
-        >
-          <IonList>
-            <IonItem>
-              <IonInput
-                label="Correo"
-                labelPlacement="floating"
-                type="email"
-                autocomplete="email"
-                value={correo}
-                onIonInput={(e) => setCorreo(e.detail.value ?? "")}
-              />
-            </IonItem>
-            <IonItem>
-              <IonInput
-                label="Contraseña"
-                labelPlacement="floating"
-                type="password"
-                value={contrasena}
-                onIonInput={(e) => setContrasena(e.detail.value ?? "")}
-              />
-            </IonItem>
-          </IonList>
+      <IonContent className="auth-content">
+        <div className="auth-shell auth-shell--login">
+          <header className="auth-brand">
+            <div className="auth-logo" aria-hidden="true">
+              <IonIcon icon={leafOutline} />
+            </div>
+            <h1>FitFlip</h1>
+            <p className="auth-subtitle">
+              Contador de calorías para un estilo de vida saludable.
+            </p>
+          </header>
 
-          {error && (
-            <IonText color="danger">
-              <p className="ion-padding-start">{error}</p>
-            </IonText>
-          )}
+          <IonCard className="auth-card">
+            <IonCardContent>
+              <div className="auth-card-heading">
+                <h2>Bienvenido de nuevo</h2>
+                <p>Inicia sesión para continuar.</p>
+              </div>
 
-          <IonButton
-            className="ion-margin-top"
-            expand="block"
-            type="submit"
-            disabled={submitting}
-          >
-            Entrar
-          </IonButton>
-          <IonButton
-            expand="block"
-            fill="clear"
-            routerLink="/register"
-          >
-            Crear una cuenta
-          </IonButton>
-        </form>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleLogin();
+                }}
+              >
+                <IonItem className="auth-field" lines="none">
+                  <IonInput
+                    label="Correo"
+                    labelPlacement="floating"
+                    type="email"
+                    autocomplete="email"
+                    value={correo}
+                    onIonInput={(e) => setCorreo(e.detail.value ?? "")}
+                  />
+                </IonItem>
+                <IonItem className="auth-field" lines="none">
+                  <IonInput
+                    label="Contraseña"
+                    labelPlacement="floating"
+                    type="password"
+                    value={contrasena}
+                    onIonInput={(e) => setContrasena(e.detail.value ?? "")}
+                  />
+                </IonItem>
+
+                {error && (
+                  <IonText color="danger">
+                    <p className="auth-error">{error}</p>
+                  </IonText>
+                )}
+
+                <IonButton
+                  className="auth-primary-button"
+                  expand="block"
+                  type="submit"
+                  disabled={submitting}
+                >
+                  Iniciar sesión
+                </IonButton>
+              </form>
+
+              <div className="auth-switch">
+                <span>¿Aún no tienes cuenta?</span>
+                <IonButton fill="clear" size="small" routerLink="/register">
+                  Crear cuenta
+                </IonButton>
+              </div>
+            </IonCardContent>
+          </IonCard>
+        </div>
 
         <IonLoading isOpen={submitting} message="Verificando…" />
       </IonContent>
